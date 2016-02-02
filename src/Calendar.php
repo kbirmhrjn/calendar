@@ -1,8 +1,39 @@
 <?php
 namespace Kabir;
 
-class Calendar {
-        private $bs = array(
+class Calendar
+{
+        protected static $nepaliMonths = [
+                            1 => "Baishak",
+                            2 => "Jestha",
+                            3 => "Ashad",
+                            4 => "Shrawn",
+                            5 => "Bhadra",
+                            6 => "Ashwin",
+                            7 => "Kartik",
+                            8 => "Mangshir",
+                            9 => "Poush",
+                            10 => "Magh",
+                            11 => "Falgun",
+                            12 => "Chaitra",
+        ];
+
+        protected static $englishMonths = [
+                    1   => "January",
+                    2   => "February",
+                    3   => "March",
+                    4   => "April",
+                    5   => "May",
+                    6   => "June",
+                    7   => "July",
+                    8   => "August",
+                    9   => "September",
+                    10  => "October",
+                    11  => "November",
+                    12  => "December",
+        ];
+
+        private $bikramSambat = array(
             0=>array(2000,30,32,31,32,31,30,30,30,29,30,29,31),
             1=>array(2001,31,31,32,31,31,31,30,29,30,29,30,30),
             2=>array(2002,31,31,32,32,31,30,30,29,30,29,30,30),
@@ -100,7 +131,6 @@ class Calendar {
         private $eng_date = array('year'=>'', 'month'=>'', 'date'=>'', 'day'=>'','emonth'=>'','num_day'=>'');
         public $debug_info = "";
 
-
         /**
          * Calculates wheather english year is leap year or not
          *
@@ -129,101 +159,14 @@ class Calendar {
             }
         }
 
-        private function get_nepali_month($m){
-            $n_month = false;
-
-            switch($m){
-                case 1:
-                    $n_month = "Baishak";
-                    break;
-
-                case 2:
-                    $n_month = "Jestha";
-                    break;
-
-                case 3:
-                    $n_month = "Ashad";
-                    break;
-
-                case 4:
-                    $n_month = "Shrawn";
-                    break;
-
-                case 5:
-                    $n_month = "Bhadra";
-                    break;
-
-                case 6:
-                    $n_month = "Ashwin";
-                    break;
-
-                case 7:
-                    $n_month = "kartik";
-                    break;
-
-                case 8:
-                    $n_month = "Mangshir";
-                    break;
-
-                case 9:
-                    $n_month = "Poush";
-                    break;
-
-                case 10:
-                    $n_month = "Magh";
-                    break;
-
-                case 11:
-                    $n_month = "Falgun";
-                    break;
-
-                case 12:
-                    $n_month = "Chaitra";
-                    break;
-            }
-            return  $n_month;
+        private function getNepaliMonth($index = 0)
+        {
+            return isset(static::$nepaliMonths[$index]) ? static::$nepaliMonths[$index] : false;
         }
 
-        private function get_english_month($m){
-            $eMonth = false;
-            switch($m){
-                case 1:
-                    $eMonth = "January";
-                    break;
-                case 2:
-                    $eMonth = "February";
-                    break;
-                case 3:
-                    $eMonth = "March";
-                    break;
-                case 4:
-                    $eMonth = "April";
-                    break;
-                case 5:
-                    $eMonth = "May";
-                    break;
-                case 6:
-                    $eMonth = "June";
-                    break;
-                case 7:
-                    $eMonth = "July";
-                    break;
-                case 8:
-                    $eMonth = "August";
-                    break;
-                case 9:
-                    $eMonth = "September";
-                    break;
-                case 10:
-                    $eMonth = "October";
-                    break;
-                case 11:
-                    $eMonth = "November";
-                    break;
-                case 12:
-                    $eMonth = "December";
-            }
-            return $eMonth;
+        private function getEnglishMonth($index = 0)
+        {
+            return isset(static::$englishMonths[$index]) ? static::$englishMonths[$index] : false;
         }
 
         private function get_day_of_week($day){
@@ -260,7 +203,8 @@ class Calendar {
         }
 
 
-        private function is_range_eng($yy, $mm, $dd){
+        private function is_range_eng($yy, $mm, $dd)
+        {
             if($yy<1944 || $yy>2033){
                 $this->debug_info = "Supported only between 1944-2022";
                 return false;
@@ -308,7 +252,9 @@ class Calendar {
          * @return unknown
          */
 
-        public function eng_to_nep($yy,$mm,$dd){
+        public function eng_to_nep($yy,$mm,$dd)
+        {
+
             if ($this->is_range_eng($yy, $mm, $dd) == false){
                 return false;
             } else {
@@ -352,7 +298,7 @@ class Calendar {
 
                 // count nepali date from array
                 while($total_eDays != 0) {
-                    $a = $this->bs[$i][$j];
+                    $a = $this->bikramSambat[$i][$j];
                     $total_nDays++;                     //count the days
                     $day++;                             //count the days interms of 7 days
                     if($total_nDays > $a){
@@ -378,7 +324,7 @@ class Calendar {
                 $this->nep_date["month"] = $m;
                 $this->nep_date["date"] = $total_nDays;
                 $this->nep_date["day"] = $this->get_day_of_week($day);
-                $this->nep_date["nmonth"] = $this->get_nepali_month($m);
+                $this->nep_date["nmonth"] = $this->getNepaliMonth($m);
                 $this->nep_date["num_day"] = $numDay;
                 return $this->nep_date;
             }
@@ -412,14 +358,14 @@ class Calendar {
                 // count total days in-terms of year
                 for($i=0; $i<($yy-$def_nyy); $i++){
                     for($j=1; $j<=12; $j++){
-                        $total_nDays += $this->bs[$k][$j];
+                        $total_nDays += $this->bikramSambat[$k][$j];
                     }
                     $k++;
                 }
 
                 // count total days in-terms of month
                 for($j=1; $j<$mm; $j++){
-                    $total_nDays += $this->bs[$k][$j];
+                    $total_nDays += $this->bikramSambat[$k][$j];
                 }
 
                 // count total days in-terms of dat
@@ -458,7 +404,7 @@ class Calendar {
                 $this->eng_date["month"] = $m;
                 $this->eng_date["date"] = $total_eDays;
                 $this->eng_date["day"] = $this->get_day_of_week($day);
-                $this->eng_date["emonth"] = $this->get_english_month($m);
+                $this->eng_date["emonth"] = $this->getEnglishMonth($m);
                 $this->eng_date["num_day"] = $numDay;
 
                 return $this->eng_date;
